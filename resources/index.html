@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>CLJS and D3</title>
+<style>
+body {
+	margin: 0;
+	padding: 0;
+}
+svg {
+	height: 100vh;
+	width: 100vw;
+}
+span {
+	position: fixed;
+	bottom: 10px;
+	right: 10px;
+	white-space: pre-line;
+	pointer-events: none;
+}
+rect {
+	stroke: none;
+	fill: rgba(70, 130, 180, 0.3);
+}
+circle {
+	stroke: steelblue;
+	stroke-width: 1.5px;
+	vector-effect: non-scaling-stroke;
+	fill: none;
+}
+</style>
+</head>
+<body>
+	<svg viewBox="-1 -1 1 1">
+		<rect x="1" y="1"/>
+		<circle r="0"/>
+	</svg>
+	<span></span>
+	<script src="main.js"></script>
+</body>
+</html>
