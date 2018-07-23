@@ -2,9 +2,14 @@
   (:require [goog.object]
             [d3-selection :as d3]
             [d3-shape :refer [symbol]]
-            [d3-ease :refer [easeLinear easeElastic easeBackOut]
-             :rename {easeLinear linear easeElastic elastic easeBackOut back-out}]
-            [d3-transition]))
+            [d3-ease :refer [easeLinear easeElastic easeBackOut easeExpOut]
+             :rename {easeLinear linear easeElastic elastic
+                      easeBackOut back-out easeExpOut exponential}]
+            [d3-transition]
+            [d3-interpolate :refer [interpolateNumber]
+             :rename {interpolateNumber interpolate-number}]
+            ["d3-interpolate/src/transform/parse" :refer [parseSvg]
+             :rename {parseSvg parse-transform}]))
 
 (defn get [prop] (let [prop (name prop)] #(goog.object/get % prop)))
 
@@ -31,9 +36,9 @@
                  (.lineTo i 0)
                  (.moveTo -o 0)
                  (.lineTo -i 0)
-                 (.moveTo 0 o)
+                 (.moveTo 0 1)
                  (.lineTo 0 i)
-                 (.moveTo 0 -o)
+                 (.moveTo 0 -1)
                  (.lineTo 0 -i)
                  (.moveTo m 0)
                  (.arc 0 0 m 0 (* js/Math.PI 2))
@@ -41,7 +46,13 @@
 
 (let [[svg span rect path] (map d3/select ["svg" "span" "rect" "path"])
       crosshairs (.. (symbol) (size 0.001) (type crosshairs))
-      ease (.. elastic (amplitude 1.1) (period 0.4))]
+      elastic (.. elastic (amplitude 1.1) (period 0.4))
+      tween
+      (fn [[x y] _ [$]]
+        (let [v (parse-transform (.getAttribute $ "transform"))
+              y (interpolate-number (.-translateY v) y)
+              x (interpolate-number (.-translateX v) x)]
+          (fn [t] (str "translate(" (x (exponential t)) " " (y (elastic t)) ")"))))]
   (.. svg
      (on "mousemove"
          (fn []
@@ -60,10 +71,11 @@
                  (text (str x  ", " y  "\n"
                             cx ", " cy)))
              (.. path
+                 (datum [cx cy])
                  (transition)
                  (duration 500)
-                 (ease ease)
-                 (attr 'transform (str "translate(" cx " " cy ")"))
+                 (ease linear)
+                 (attrTween 'transform tween)
                  (attr 'd (crosshairs)))
              (.. rect
                  (attr 'x x1)

@@ -11,6 +11,7 @@
    ;:optimizations :advanced
    :npm-deps {:d3-selection "latest"
               :d3-transition "latest"
+              :d3-interpolate "latest"
               :d3-shape "latest"
               :d3-ease "latest"}
    :install-deps true})
